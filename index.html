@@ -1,0 +1,206 @@
+<!doctype html>
+<!-- Copyright (c) 2026 Michael E. Anderson. All rights reserved. -->
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Lake Command is an AI-assisted environmental intelligence platform for lake, weather, species, route, and trip planning signals."
+    />
+    <title>Lake Command | Environmental Intelligence Platform</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #08110f;
+        --panel: #111d1a;
+        --ink: #f4f7f4;
+        --muted: #a9b8b2;
+        --line: rgba(255, 255, 255, 0.14);
+        --green: #56f08a;
+        --amber: #ff9d3c;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 12% 8%, rgba(53, 214, 208, 0.18), transparent 30rem),
+          linear-gradient(180deg, #06100e 0%, var(--bg) 58%, #050807 100%);
+        color: var(--ink);
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+          sans-serif;
+      }
+
+      a {
+        color: inherit;
+        text-decoration: none;
+      }
+
+      .shell {
+        width: min(1120px, calc(100% - 32px));
+        margin: 0 auto;
+        padding: 28px 0 52px;
+      }
+
+      header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 18px;
+        padding: 10px 0 24px;
+      }
+
+      .brand {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+      }
+
+      .brand strong {
+        font-size: 18px;
+      }
+
+      .brand span {
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      nav {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 10px;
+      }
+
+      .button {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 10px 14px;
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--ink);
+        font-weight: 700;
+        font-size: 14px;
+      }
+
+      .button.primary {
+        border-color: rgba(86, 240, 138, 0.55);
+        background: linear-gradient(135deg, rgba(86, 240, 138, 0.22), rgba(53, 214, 208, 0.16));
+      }
+
+      .hero {
+        display: grid;
+        gap: 24px;
+        padding: 30px 0 18px;
+      }
+
+      h1 {
+        max-width: 900px;
+        margin: 0;
+        font-size: clamp(42px, 8vw, 84px);
+        line-height: 0.95;
+        letter-spacing: 0;
+      }
+
+      .subtitle {
+        max-width: 760px;
+        margin: 0;
+        color: var(--muted);
+        font-size: clamp(18px, 2.4vw, 24px);
+        line-height: 1.45;
+      }
+
+      .demo {
+        overflow: hidden;
+        border: 1px solid rgba(53, 214, 208, 0.35);
+        border-radius: 8px;
+        background: #030706;
+        box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+      }
+
+      .demo img {
+        display: block;
+        width: 100%;
+        height: auto;
+      }
+
+      .status {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 26px;
+      }
+
+      .pill {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 8px 11px;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--muted);
+        font-size: 13px;
+        font-weight: 700;
+      }
+
+      .pill.done {
+        color: var(--green);
+        border-color: rgba(86, 240, 138, 0.35);
+      }
+
+      .pill.active {
+        color: var(--amber);
+        border-color: rgba(255, 157, 60, 0.35);
+      }
+
+      @media (max-width: 760px) {
+        header {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        nav {
+          justify-content: flex-start;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <div class="brand">
+          <strong>Lake Command</strong>
+          <span>AI-assisted environmental intelligence</span>
+        </div>
+        <nav aria-label="Project links">
+          <a class="button primary" href="lake-command-demo.gif">Demo GIF</a>
+          <a class="button" href="https://github.com/CapAhabb/Lake-Command-In-Depth">GitHub</a>
+          <a class="button" href="https://github.com/CapAhabb/Lake-Command-In-Depth/blob/main/docs/ROADMAP.md">Roadmap</a>
+        </nav>
+      </header>
+
+      <section class="hero" aria-labelledby="title">
+        <h1 id="title">Lake Command</h1>
+        <p class="subtitle">
+          AI-assisted environmental intelligence for lake conditions, species signals,
+          dynamic overlays, and scenario planning.
+        </p>
+        <div class="demo">
+          <img src="lake-command-demo.gif" alt="Animated Lake Command interface demo" />
+        </div>
+      </section>
+
+      <section class="status" aria-label="Development status">
+        <span class="pill done">Modular architecture</span>
+        <span class="pill done">Interactive mapping</span>
+        <span class="pill done">AI-assisted development</span>
+        <span class="pill active">Faux datasets</span>
+        <span class="pill active">Scenario planning</span>
+        <span class="pill active">Agent orchestration</span>
+      </section>
+    </main>
+  </body>
+</html>
