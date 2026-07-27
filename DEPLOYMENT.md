@@ -1,5 +1,13 @@
 # Deployment
 
+## Live GitHub Pages Review
+
+This repo can be served directly from the `docs` folder with GitHub Pages:
+
+- Source branch: `main`
+- Source folder: `/docs`
+- Review URL: `https://capahabb.github.io/lake-command-review/`
+
 ## Free Vercel Static Hosting
 
 This repo includes a prebuilt Flutter web app in `public`, so Vercel can host it
@@ -31,4 +39,3 @@ Docker serves the included static build:
 docker build -t lake-command-review .
 docker run --rm -p 4173:4173 lake-command-review
 ```
-

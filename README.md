@@ -2,6 +2,12 @@
 
 This Flutter app powers the current Lake Command In Depth experience.
 
+Live review build:
+
+```text
+https://capahabb.github.io/lake-command-review/
+```
+
 It opens with a guided splash screen, then moves into a structured set of
 menus for trip planning, lake overview, species guidance, departures, and
 supporting on-the-water decision flows.
