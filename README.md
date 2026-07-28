@@ -2,14 +2,20 @@
 
 This Flutter app powers the current Lake Command In Depth experience.
 
-It opens with a guided splash screen, then moves into a structured set of
-menus for trip planning, lake overview, species guidance, departures, and
-supporting on-the-water decision flows.
+It currently presents the Core Command hardware-console shell for the Lake
+Command product family. The product model selector and bottom module controls
+are reviewable UI states inside the same program shell.
+
+Cross-application switching is not functional yet. Selecting another product
+model or toggling an armed module does not launch a separate application; those
+states are placeholders for the future shared command layer.
 
 ## Main Areas
 
 - Splash entry into the menu system
 - Lake overview and general fish location guidance
+- Core Command product model selector
+- Active and armed module control states
 - Species-specific menu branches
 - Trip controls and recommended route flow
 - Supporting trip intel and operational screens

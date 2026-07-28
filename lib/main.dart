@@ -14,6 +14,15 @@ import 'package:vector_tile_renderer/vector_tile_renderer.dart' as vtr;
 
 import 'services/seagull_current_service.dart';
 
+const List<String> _productModels = [
+  'Core Command',
+  'Lake Command',
+  'AquaPlotter',
+  'LakeGuard Pro',
+  'SpaceTrout',
+  'RescueGuard Pro',
+];
+
 void main() {
   runApp(const LakeIntelligenceProApp());
 }
@@ -67,6 +76,7 @@ class _LakeGuardScreenState extends State<LakeGuardScreen>
   int _radarRefreshKey = DateTime.now().millisecondsSinceEpoch;
   bool _animateCurrents = true;
   String? _middleMouseModule;
+  String _selectedProductModel = _productModels.first;
   final vmt.TileProviders _noaaBathymetryProviders = vmt.TileProviders({
     'esri': vmt.NetworkVectorTileProvider(
       urlTemplate:
@@ -98,6 +108,7 @@ class _LakeGuardScreenState extends State<LakeGuardScreen>
     'Waypoints / Marked Fish': 0.95,
     'Weather Radar': 0.5,
   };
+  final Set<String> _armedModules = {};
 
   double _plotterZoom = 7.0;
 
@@ -378,6 +389,12 @@ class _LakeGuardScreenState extends State<LakeGuardScreen>
     };
   }
 
+  String _moduleRunStateLabel(String module) {
+    if (_armedModules.contains(module)) return 'ARMED';
+    if (_moduleStates[module] ?? false) return 'ACTIVE';
+    return 'OFF';
+  }
+
   List<Marker> _buildWaveMarkers() {
     if (_forecastWaves) {
       final value = _seagullForecast?.waveHeightMeters;
@@ -487,7 +504,16 @@ class _LakeGuardScreenState extends State<LakeGuardScreen>
 
   void _toggleModule(String module) {
     setState(() {
-      _moduleStates[module] = !(_moduleStates[module] ?? false);
+      final isActive = _moduleStates[module] ?? false;
+      final isArmed = _armedModules.contains(module);
+      if (isActive && !isArmed) {
+        _armedModules.add(module);
+      } else if (isArmed) {
+        _armedModules.remove(module);
+        _moduleStates[module] = false;
+      } else {
+        _moduleStates[module] = true;
+      }
     });
     if (module == 'Current') {
       _syncCurrentAnimation();
@@ -681,24 +707,34 @@ class _LakeGuardScreenState extends State<LakeGuardScreen>
               colors: [Color(0xFF07111B), Color(0xFF003B64), Color(0xFF07111B)],
             ),
           ),
-          child: const Row(
+          child: Row(
             children: [
-              Text(
-                'AquaPlotter',
+              const Text(
+                'Core Command',
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 25,
                   fontWeight: FontWeight.w900,
                 ),
               ),
-              SizedBox(width: 18),
-              Icon(Icons.signal_cellular_alt, color: Colors.white, size: 27),
-              Spacer(),
-              Icon(Icons.navigation, color: Colors.white, size: 32),
-              Spacer(),
-              Icon(Icons.usb, color: Color(0xFF15F04B), size: 23),
-              SizedBox(width: 18),
-              Icon(Icons.battery_full, color: Color(0xFF55F15B), size: 30),
+              const SizedBox(width: 14),
+              _buildProductModelDropdown(),
+              const SizedBox(width: 14),
+              const Icon(
+                Icons.signal_cellular_alt,
+                color: Colors.white,
+                size: 27,
+              ),
+              const Spacer(),
+              const Icon(Icons.navigation, color: Colors.white, size: 32),
+              const Spacer(),
+              const Icon(Icons.usb, color: Color(0xFF15F04B), size: 23),
+              const SizedBox(width: 18),
+              const Icon(
+                Icons.battery_full,
+                color: Color(0xFF55F15B),
+                size: 30,
+              ),
             ],
           ),
         ),
@@ -712,6 +748,46 @@ class _LakeGuardScreenState extends State<LakeGuardScreen>
         ),
         SizedBox(height: 126, child: _buildModuleStrip()),
       ],
+    );
+  }
+
+  Widget _buildProductModelDropdown() {
+    return Container(
+      height: 27,
+      constraints: const BoxConstraints(minWidth: 178, maxWidth: 230),
+      padding: const EdgeInsets.only(left: 10, right: 6),
+      decoration: BoxDecoration(
+        color: const Color(0xFF061018),
+        border: Border.all(color: const Color(0xFF25D6FF), width: 1.2),
+        borderRadius: BorderRadius.circular(6),
+        boxShadow: const [BoxShadow(color: Color(0x6600D9FF), blurRadius: 8)],
+      ),
+      child: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          key: const Key('product-model-dropdown'),
+          value: _selectedProductModel,
+          isExpanded: true,
+          dropdownColor: const Color(0xFF07111B),
+          iconEnabledColor: const Color(0xFFFF9A36),
+          style: const TextStyle(
+            color: Color(0xFFEFFFF1),
+            fontSize: 13,
+            fontWeight: FontWeight.w900,
+          ),
+          items: _productModels
+              .map(
+                (model) => DropdownMenuItem<String>(
+                  value: model,
+                  child: Text(model, overflow: TextOverflow.ellipsis),
+                ),
+              )
+              .toList(),
+          onChanged: (model) {
+            if (model == null) return;
+            setState(() => _selectedProductModel = model);
+          },
+        ),
+      ),
     );
   }
 
@@ -965,7 +1041,9 @@ class _LakeGuardScreenState extends State<LakeGuardScreen>
 
   Widget _buildModuleControl(String module) {
     final isOn = _moduleStates[module] ?? false;
+    final isArmed = _armedModules.contains(module);
     final opacity = _moduleOpacity[module] ?? 1;
+    final isOperational = isOn || isArmed;
     return Listener(
       onPointerDown: (event) {
         if (event.buttons & kMiddleMouseButton != 0) {
@@ -996,7 +1074,7 @@ class _LakeGuardScreenState extends State<LakeGuardScreen>
               gradient: LinearGradient(
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
-                colors: isOn
+                colors: isOperational
                     ? const [
                         Color(0xFF46FF4A),
                         Color(0xFF12A91A),
@@ -1008,19 +1086,39 @@ class _LakeGuardScreenState extends State<LakeGuardScreen>
                         Color(0xFF070809),
                       ],
               ),
-              border: Border.all(color: const Color(0xFF666C70), width: 1.5),
+              border: Border.all(
+                color: isArmed
+                    ? const Color(0xFFFF8A1A)
+                    : isOperational
+                    ? const Color(0xFF76FF74)
+                    : const Color(0xFF666C70),
+                width: isArmed ? 2.6 : 1.5,
+              ),
               borderRadius: BorderRadius.circular(7),
-              boxShadow: const [
-                BoxShadow(
+              boxShadow: [
+                const BoxShadow(
                   color: Colors.black,
                   blurRadius: 6,
                   offset: Offset(2, 4),
                 ),
-                BoxShadow(
-                  color: Color(0x445F686F),
-                  blurRadius: 1,
-                  offset: Offset(0, -1),
-                ),
+                if (isArmed)
+                  const BoxShadow(
+                    color: Color(0xCCFF8A1A),
+                    blurRadius: 13,
+                    spreadRadius: 1.8,
+                  )
+                else if (isOperational)
+                  const BoxShadow(
+                    color: Color(0x8846FF4A),
+                    blurRadius: 10,
+                    spreadRadius: 1,
+                  )
+                else
+                  const BoxShadow(
+                    color: Color(0x445F686F),
+                    blurRadius: 1,
+                    offset: Offset(0, -1),
+                  ),
               ],
             ),
             child: Column(
@@ -1045,8 +1143,43 @@ class _LakeGuardScreenState extends State<LakeGuardScreen>
                     ),
                   ),
                 ),
+                Container(
+                  key: ValueKey('module-run-state-$module'),
+                  margin: const EdgeInsets.fromLTRB(7, 0, 7, 0),
+                  height: 16,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: isArmed
+                        ? const Color(0x33271000)
+                        : isOperational
+                        ? const Color(0x3314FF28)
+                        : const Color(0x33000000),
+                    border: Border.all(
+                      color: isArmed
+                          ? const Color(0xFFFF8A1A)
+                          : isOperational
+                          ? const Color(0xFF7CFF79)
+                          : const Color(0xFF252A2D),
+                      width: 0.8,
+                    ),
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    _moduleRunStateLabel(module),
+                    style: TextStyle(
+                      color: isArmed
+                          ? const Color(0xFFFFA24B)
+                          : isOperational
+                          ? const Color(0xFFE9FFEA)
+                          : const Color(0xFF8D989E),
+                      fontSize: 9,
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: 0.6,
+                    ),
+                  ),
+                ),
                 SizedBox(
-                  height: 54,
+                  height: 40,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -1056,7 +1189,7 @@ class _LakeGuardScreenState extends State<LakeGuardScreen>
                         child: CustomPaint(
                           painter: _OrangeKnobPainter(
                             value: opacity,
-                            active: isOn,
+                            active: isOperational,
                           ),
                         ),
                       ),
@@ -1109,12 +1242,21 @@ class _LakeGuardScreenState extends State<LakeGuardScreen>
                       child: Text(
                         _moduleModeLabel(module),
                         style: TextStyle(
-                          color: isOn
+                          color: isArmed
+                              ? const Color(0xFFFFA24B)
+                              : isOperational
                               ? const Color(0xFFD9FFDA)
                               : const Color(0xFFFF9A36),
                           fontSize: 12,
                           fontWeight: FontWeight.w900,
-                          shadows: isOn
+                          shadows: isArmed
+                              ? const [
+                                  Shadow(
+                                    color: Color(0xFFFF8A1A),
+                                    blurRadius: 9,
+                                  ),
+                                ]
+                              : isOperational
                               ? const [
                                   Shadow(
                                     color: Color(0xFF40FF48),
